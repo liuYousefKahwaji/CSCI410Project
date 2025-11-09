@@ -1,6 +1,9 @@
 # Flutter Project: Deadline Tracker
 #### by Yousef Kahwaji
 
+## Changelog
+[Changelog](CHANGELOG.md)
+
 ## Usage:
 ### Cloning:
 * ```git clone https://github.com/liuYousefKahwaji/CSCI410Project.git```
@@ -42,3 +45,4 @@
 * ~~Adding a "Due in x days" feature~~ Done in v1.1
 * Sorting and filtering deadlines
 * Notifications for upcoming deadlines
+
