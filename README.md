@@ -38,6 +38,7 @@
 * cannot save a deadline if title is empty (grays out the save button and makes it non-functional)
 * cannot save an edited deadline if title and date match (grayed out save button)
 
-## Future Plans (v2)
-* Notifications for upcoming deadlines
+## Future Plans
+* ~~Adding a "Due in x days" feature~~ Done in 1.1
 * Sorting and filtering deadlines
+* Notifications for upcoming deadlines

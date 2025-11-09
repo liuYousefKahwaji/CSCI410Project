@@ -26,7 +26,7 @@ void main() {
         colorLight = (data['colorLight'] as List).map((v) => Color(v)).toList();
         colorDark = (data['colorDark'] as List).map((v) => Color(v)).toList();
         deadlines = List<String>.from(data['deadlines']);
-        dates = List<String>.from(data['dates']);
+        dates = (data['dates'] as List).map((v) => DateTime.parse(v)).toList();
       } catch (e) {
         await file.delete();
       }
@@ -45,11 +45,11 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-Future<void> _writeData({required bool isLightTheme, required List<Color> themeColor, required List<Color> colorLight, required List<Color> colorDark, required List<String> deadlines, required List<String> dates}) async {
+Future<void> _writeData({required bool isLightTheme, required List<Color> themeColor, required List<Color> colorLight, required List<Color> colorDark, required List<String> deadlines, required List<DateTime> dates}) async {
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/data.json');
 
-  final data = {'isLightTheme': isLightTheme, 'themeColor': themeColor.map((c) => c.value).toList(), 'colorLight': colorLight.map((c) => c.value).toList(), 'colorDark': colorDark.map((c) => c.value).toList(), 'deadlines': deadlines, 'dates': dates};
+  final data = {'isLightTheme': isLightTheme, 'themeColor': themeColor.map((c) => c.value).toList(), 'colorLight': colorLight.map((c) => c.value).toList(), 'colorDark': colorDark.map((c) => c.value).toList(), 'deadlines': deadlines, 'dates': dates.map((d) => d.toIso8601String()).toList()};
   await file.writeAsString(jsonEncode(data));
 }
 
@@ -83,7 +83,10 @@ List<IconData> iconDark = [Icons.dark_mode_outlined];
 
 bool isLightTheme = true;
 List<String> deadlines = [];
-List<String> dates = [];
+List<DateTime> dates = [];
+TextEditingController deadlineController = TextEditingController();
+
+DateTime nowDate = DateTime.now();
 
 List<Color> themeColor = colorLight;
 List<IconData> themeIcon = iconLight;
@@ -104,8 +107,48 @@ class _MainAppState extends State<MainApp> {
     _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, deadlines: deadlines, dates: dates);
   }
 
+  String dateCalculator(DateTime date1,DateTime date2){
+    date2 = DateTime(date2.year,date2.month,date2.day, 23,59,59);
+
+    int yeardiff = date2.year - date1.year; bool yearflag = false;
+    int monthdiff = date2.month - date1.month; bool monthflag = false;
+    int daydiff = date2.day - date1.day;
+
+    if(date2.isBefore(date1)) return 'Date Passed';
+
+    if(yeardiff==0){
+      if(monthdiff==0){
+        if(daydiff==0){
+          return 'Today';
+        } else {
+          return daydiff==1?'Tomorrow':'in $daydiff days';
+        }
+      } else {
+        if(daydiff>=15) {
+          monthdiff+=1;
+          monthflag = true;
+        }
+        if(daydiff<0 && monthdiff==1) {
+          daydiff+=DateTime(date2.year,date2.month,0).day;
+          return daydiff==1?'Tomorrow':'in $daydiff days';
+        }
+        return monthdiff==1?'Next Month':'in ${monthflag?'~':''}$monthdiff months';
+      }
+    }else{
+      if(monthdiff>=6) {
+        yeardiff+=1;
+        yearflag = true;
+      }
+      if(monthdiff<0 && yeardiff==1){
+        monthdiff+=12;
+        return monthdiff==1?'Next Month':'in $monthdiff months';
+      }
+      return yeardiff==1?'Next Year':'in ${yearflag?'~':''}$yeardiff months';
+    }
+  }
+
   String currentDeadline = '';
-  String currentDate = '';
+  DateTime currentDate = DateTime.utc(0, 0, 0);
 
   int redIn = 0;
   int greenIn = 0;
@@ -387,7 +430,8 @@ class _MainAppState extends State<MainApp> {
               backgroundColor: themeColor[1],
               onPressed: () {
                 currentDeadline = '';
-                currentDate = '';
+                deadlineController.text = '';
+                currentDate = DateTime.utc(0, 0, 0);
                 setState(() {
                   showAdaptiveDialog(
                     context: context,
@@ -399,10 +443,16 @@ class _MainAppState extends State<MainApp> {
                             child: Column(
                               children: [
                                 TextField(
+                                  controller: deadlineController,
                                   cursorColor: themeColor[1],
                                   onChanged: (input) {
                                     setState(() {
                                       setDialogState(() {
+                                        if(input.length>50){
+                                          deadlineController.text = currentDeadline;
+                                          deadlineController.selection = TextSelection.fromPosition(TextPosition(offset: currentDeadline.length));
+                                          return;
+                                        }
                                         currentDeadline = input;
                                       });
                                     });
@@ -440,7 +490,7 @@ class _MainAppState extends State<MainApp> {
                                           if (selectedDate != null) {
                                             setState(() {
                                               setDialogState(() {
-                                                currentDate = '${selectedDate.month}/${selectedDate.day}/${selectedDate.year}';
+                                                currentDate = selectedDate;
                                               });
                                             });
                                           }
@@ -448,14 +498,14 @@ class _MainAppState extends State<MainApp> {
                                       },
                                       icon: AnimIcon(themeColor[1], themeIcon[0], Icons.date_range_outlined),
                                     ),
-                                    currentDate.isNotEmpty
+                                    currentDate!=DateTime.utc(0, 0, 0)
                                         ? Expanded(
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Padding(
                                                   padding: const EdgeInsets.only(top: 2, right: 8.0, bottom: 0.0, left: 1.0),
-                                                  child: Text(currentDate, style: TextStyle(color: themeColor[1], fontSize: 16)),
+                                                  child: Text('${currentDate.month}/${currentDate.day}/${currentDate.year}', style: TextStyle(color: themeColor[1], fontSize: 16)),
                                                 ),
                                                 Padding(
                                                   padding: const EdgeInsets.only(top: 2, right: 0.0, bottom: 0.0, left: 18.0),
@@ -463,7 +513,7 @@ class _MainAppState extends State<MainApp> {
                                                     onPressed: () {
                                                       setState(() {
                                                         setDialogState(() {
-                                                          currentDate = '';
+                                                          currentDate = DateTime.utc(0, 0, 0);
                                                         });
                                                       });
                                                     },
@@ -514,21 +564,29 @@ class _MainAppState extends State<MainApp> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: AnimText("You have ${deadlines.length} deadlines:", style: TextStyle(fontSize: 24, color: themeColor[1])),
+                        child: AnimText("You have ${deadlines.length} deadline${deadlines.length==1?'':'s'}:", style: TextStyle(fontSize: 24, color: themeColor[1])),
                       ),
                       for (String deadline in deadlines)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 16.0, left: 18.0, right: 5.0, bottom: 16.0),
-                                child: AnimText(
-                                  dates[deadlines.indexOf(deadline)].isNotEmpty ? "$deadline\nDue ${dates[deadlines.indexOf(deadline)]}" : deadline,
-                                  style: TextStyle(fontSize: 19.5, color: themeColor[1]),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: dates[deadlines.indexOf(deadline)].isNotEmpty ? 2 : 1,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16.0, left: 18.0, right: 5.0, bottom: 10.0),
+                                    child: AnimText(
+                                      deadline,
+                                      style: TextStyle(fontSize: 19.5, color: themeColor[1]),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ), ?dates[deadlines.indexOf(deadline)]==DateTime.utc(0, 0, 0) ? null : Padding(
+                                    padding: const EdgeInsets.only(top: 0, left:20.0, right: 5.0, bottom: 10.0),
+                                    child: AnimText('${dates[deadlines.indexOf(deadline)].month}/${dates[deadlines.indexOf(deadline)].day}/${dates[deadlines.indexOf(deadline)].year}, Due ${dateCalculator(nowDate, dates[deadlines.indexOf(deadline)])}', style: TextStyle(fontSize: 17, color: themeColor[1]),),
+                                    )
+                                ],
                               ),
                             ),
                             Padding(
@@ -557,7 +615,7 @@ class _MainAppState extends State<MainApp> {
                                                               deadlines[i] = currentDeadline;
                                                               dates[i] = currentDate;
                                                               currentDeadline = '';
-                                                              currentDate = '';
+                                                              currentDate = DateTime.utc(0, 0, 0);
                                                               _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, deadlines: deadlines, dates: dates);
                                                             });
                                                             Navigator.of(context).pop();
@@ -574,6 +632,11 @@ class _MainAppState extends State<MainApp> {
                                                       onChanged: (input) {
                                                         setState(() {
                                                           setDialogState(() {
+                                                            if(input.length>50){
+                                                              textEditingController.text = currentDeadline;
+                                                              textEditingController.selection = TextSelection.fromPosition(TextPosition(offset: currentDeadline.length),);
+                                                              return;
+                                                            }
                                                             currentDeadline = input;
                                                           });
                                                         });
@@ -611,7 +674,7 @@ class _MainAppState extends State<MainApp> {
                                                               if (selectedDate != null) {
                                                                 setState(() {
                                                                   setDialogState(() {
-                                                                    currentDate = '${selectedDate.month}/${selectedDate.day}/${selectedDate.year}';
+                                                                    currentDate = selectedDate;
                                                                   });
                                                                 });
                                                               }
@@ -619,14 +682,14 @@ class _MainAppState extends State<MainApp> {
                                                           },
                                                           icon: AnimIcon(themeColor[1], themeIcon[0], Icons.date_range_outlined),
                                                         ),
-                                                        currentDate.isNotEmpty
+                                                        currentDate!=DateTime.utc(0, 0, 0)
                                                             ? Expanded(
                                                                 child: Row(
                                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                   children: [
                                                                     Padding(
                                                                       padding: const EdgeInsets.only(top: 2, right: 8.0, bottom: 0.0, left: 1.0),
-                                                                      child: Text(currentDate, style: TextStyle(color: themeColor[1], fontSize: 16)),
+                                                                      child: Text('${currentDate.month}/${currentDate.day}/${currentDate.year}', style: TextStyle(color: themeColor[1], fontSize: 16)),
                                                                     ),
                                                                     Padding(
                                                                       padding: const EdgeInsets.only(top: 2, right: 0.0, bottom: 0.0, left: 18.0),
@@ -634,7 +697,7 @@ class _MainAppState extends State<MainApp> {
                                                                         onPressed: () {
                                                                           setState(() {
                                                                             setDialogState(() {
-                                                                              currentDate = '';
+                                                                              currentDate = DateTime.utc(0, 0, 0);
                                                                             });
                                                                           });
                                                                         },
@@ -665,8 +728,8 @@ class _MainAppState extends State<MainApp> {
                               child: IconButton(
                                 onPressed: () {
                                   setState(() {
+                                    dates.removeAt(deadlines.indexOf(deadline));
                                     deadlines.remove(deadline);
-                                    dates.removeAt(deadlines.indexOf(deadline) + 1);
                                     _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, deadlines: deadlines, dates: dates);
                                   });
                                 },
