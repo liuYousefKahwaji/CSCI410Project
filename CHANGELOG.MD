@@ -1,3 +1,5 @@
+#v1.1
+
 - changed dates list from String to DateTime, modified read and write functions to accomodate the change, as well as all usages for dates
 - added a TextEditingController for adding new deadlines, similar to the one made for editing deadlines
 - added a dateCalculator function to calculate the difference between current time and deadline time
