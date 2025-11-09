@@ -2,7 +2,7 @@
 #### by Yousef Kahwaji
 
 ## Changelog
-[Changelog](CHANGELOG.md)
+[Changelog](CHANGELOG.MD)
 
 ## Usage:
 ### Cloning:
