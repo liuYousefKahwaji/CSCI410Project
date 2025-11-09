@@ -42,4 +42,3 @@
 * ~~Adding a "Due in x days" feature~~ Done in 1.1
 * Sorting and filtering deadlines
 * Notifications for upcoming deadlines
-* Sorting and filtering deadlines
