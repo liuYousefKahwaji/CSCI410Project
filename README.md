@@ -1,6 +1,9 @@
 # Flutter Project: Deadline Tracker
 #### by Yousef Kahwaji
 
+## Changelog
+[Changelog](CHANGELOG.MD)
+
 ## Usage:
 ### Cloning:
 * ```git clone https://github.com/liuYousefKahwaji/CSCI410Project.git```
@@ -39,6 +42,8 @@
 * cannot save an edited deadline if title and date match (grayed out save button)
 
 ## Future Plans
-* ~~Adding a "Due in x days" feature~~ Done in 1.1
+* Making each deadline clickable (edit)
 * Sorting and filtering deadlines
 * Notifications for upcoming deadlines
+* Decreasing code size, removing repetitions into methods / widgets
+* ~~Adding a "Due in x days" feature~~ Done in v1.1
