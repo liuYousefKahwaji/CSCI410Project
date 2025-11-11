@@ -42,8 +42,8 @@
 * cannot save an edited deadline if title and date match (grayed out save button)
 
 ## Future Plans
-* Making each deadline clickable (edit)
 * Sorting and filtering deadlines
 * Notifications for upcoming deadlines
 * Decreasing code size, removing repetitions into methods / widgets
+* ~~Making each deadline clickable (edit)~~ Done in v1.2
 * ~~Adding a "Due in x days" feature~~ Done in v1.1
