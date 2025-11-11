@@ -567,176 +567,306 @@ class _MainAppState extends State<MainApp> {
                         child: AnimText("You have ${deadlines.length} deadline${deadlines.length==1?'':'s'}:", style: TextStyle(fontSize: 24, color: themeColor[1])),
                       ),
                       for (String deadline in deadlines)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 16.0, left: 18.0, right: 5.0, bottom: 10.0),
-                                    child: AnimText(
-                                      deadline,
-                                      style: TextStyle(fontSize: 19.5, color: themeColor[1]),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                    ),
-                                  ), ?dates[deadlines.indexOf(deadline)]==DateTime.utc(0, 0, 0) ? null : Padding(
-                                    padding: const EdgeInsets.only(top: 0, left:20.0, right: 5.0, bottom: 10.0),
-                                    child: AnimText('${dates[deadlines.indexOf(deadline)].month}/${dates[deadlines.indexOf(deadline)].day}/${dates[deadlines.indexOf(deadline)].year}, Due ${dateCalculator(nowDate, dates[deadlines.indexOf(deadline)])}', style: TextStyle(fontSize: 17, color: themeColor[1]),),
-                                    )
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0, right: 1.0, bottom: 8.0, left: 2.0),
-                              child: IconButton(
-                                onPressed: () {
-                                  currentDeadline = deadline;
-                                  currentDate = dates[deadlines.indexOf(deadline)];
-                                  setState(() {
-                                    TextEditingController textEditingController = TextEditingController()..text = deadline;
-                                    showAdaptiveDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return StatefulBuilder(
-                                          builder: (context, setDialogState) => Center(
-                                            child: SingleChildScrollView(
-                                              child: AlertDialog(
-                                                backgroundColor: themeColor[0],
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: (currentDeadline.isEmpty || (currentDeadline == deadline && currentDate == dates[deadlines.indexOf(deadline)]))
-                                                        ? null
-                                                        : () {
-                                                            setState(() {
-                                                              final i = deadlines.indexOf(deadline);
-                                                              deadlines[i] = currentDeadline;
-                                                              dates[i] = currentDate;
-                                                              currentDeadline = '';
-                                                              currentDate = DateTime.utc(0, 0, 0);
-                                                              _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, deadlines: deadlines, dates: dates);
-                                                            });
-                                                            Navigator.of(context).pop();
-                                                          },
-                                                    child: Text('Save', style: TextStyle(color: (currentDeadline.isEmpty || (currentDeadline == deadline && currentDate == dates[deadlines.indexOf(deadline)])) ? Colors.grey : themeColor[1])),
-                                                  ),
-                                                ],
-                                                title: Text("Edit Deadline", style: TextStyle(color: themeColor[1])),
-                                                content: Column(
-                                                  children: [
-                                                    TextField(
-                                                      controller: textEditingController,
-                                                      cursorColor: themeColor[1],
-                                                      onChanged: (input) {
-                                                        setState(() {
-                                                          setDialogState(() {
-                                                            if(input.length>50){
-                                                              textEditingController.text = currentDeadline;
-                                                              textEditingController.selection = TextSelection.fromPosition(TextPosition(offset: currentDeadline.length),);
-                                                              return;
-                                                            }
-                                                            currentDeadline = input;
-                                                          });
-                                                        });
-                                                      },
-                                                      style: TextStyle(color: themeColor[1]),
-                                                      decoration: InputDecoration(
-                                                        hintText: 'Enter deadline details',
-                                                        hintStyle: TextStyle(color: themeColor[1]),
-                                                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: themeColor[1])),
-                                                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: themeColor[1])),
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            showDatePicker(
-                                                              context: context,
-                                                              firstDate: DateTime.now(),
-                                                              lastDate: DateTime(2100),
-                                                              initialDate: DateTime.now(),
-                                                              builder: (context, child) {
-                                                                return Theme(
-                                                                  data: Theme.of(context).copyWith(
-                                                                    colorScheme: isLightTheme ? ColorScheme.light(primary: themeColor[1].withOpacity(0.6), onPrimary: themeColor[1], onSurface: themeColor[1], surface: themeColor[0]) : ColorScheme.dark(primary: themeColor[1].withOpacity(0.6), onPrimary: themeColor[1], onSurface: themeColor[1], surface: themeColor[0]),
-                                                                    textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: themeColor[1])),
-                                                                    dividerColor: themeColor[1],
-                                                                    dialogBackgroundColor: themeColor[1],
-                                                                    dialogTheme: DialogThemeData(backgroundColor: themeColor[0], surfaceTintColor: Colors.transparent),
-                                                                  ),
-                                                                  child: child!,
-                                                                );
-                                                              },
-                                                            ).then((selectedDate) {
-                                                              if (selectedDate != null) {
-                                                                setState(() {
-                                                                  setDialogState(() {
-                                                                    currentDate = selectedDate;
-                                                                  });
-                                                                });
-                                                              }
-                                                            });
-                                                          },
-                                                          icon: AnimIcon(themeColor[1], themeIcon[0], Icons.date_range_outlined),
-                                                        ),
-                                                        currentDate!=DateTime.utc(0, 0, 0)
-                                                            ? Expanded(
-                                                                child: Row(
-                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding: const EdgeInsets.only(top: 2, right: 8.0, bottom: 0.0, left: 1.0),
-                                                                      child: Text('${currentDate.month}/${currentDate.day}/${currentDate.year}', style: TextStyle(color: themeColor[1], fontSize: 16)),
-                                                                    ),
-                                                                    Padding(
-                                                                      padding: const EdgeInsets.only(top: 2, right: 0.0, bottom: 0.0, left: 18.0),
-                                                                      child: IconButton(
-                                                                        onPressed: () {
-                                                                          setState(() {
-                                                                            setDialogState(() {
-                                                                              currentDate = DateTime.utc(0, 0, 0);
-                                                                            });
-                                                                          });
-                                                                        },
-                                                                        icon: Icon(Icons.close_outlined, color: themeColor[1], size: 18),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              )
-                                                            : SizedBox.shrink(),
-                                                      ],
+                        InkWell(
+                          onTap: () {
+                                    currentDeadline = deadline;
+                                    currentDate = dates[deadlines.indexOf(deadline)];
+                                    setState(() {
+                                      TextEditingController textEditingController = TextEditingController()..text = deadline;
+                                      showAdaptiveDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setDialogState) => Center(
+                                              child: SingleChildScrollView(
+                                                child: AlertDialog(
+                                                  backgroundColor: themeColor[0],
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: (currentDeadline.isEmpty || (currentDeadline == deadline && currentDate == dates[deadlines.indexOf(deadline)]))
+                                                          ? null
+                                                          : () {
+                                                              setState(() {
+                                                                final i = deadlines.indexOf(deadline);
+                                                                deadlines[i] = currentDeadline;
+                                                                dates[i] = currentDate;
+                                                                currentDeadline = '';
+                                                                currentDate = DateTime.utc(0, 0, 0);
+                                                                _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, deadlines: deadlines, dates: dates);
+                                                              });
+                                                              Navigator.of(context).pop();
+                                                            },
+                                                      child: Text('Save', style: TextStyle(color: (currentDeadline.isEmpty || (currentDeadline == deadline && currentDate == dates[deadlines.indexOf(deadline)])) ? Colors.grey : themeColor[1])),
                                                     ),
                                                   ],
+                                                  title: Text("Edit Deadline", style: TextStyle(color: themeColor[1])),
+                                                  content: Column(
+                                                    children: [
+                                                      TextField(
+                                                        controller: textEditingController,
+                                                        cursorColor: themeColor[1],
+                                                        onChanged: (input) {
+                                                          setState(() {
+                                                            setDialogState(() {
+                                                              if(input.length>50){
+                                                                textEditingController.text = currentDeadline;
+                                                                textEditingController.selection = TextSelection.fromPosition(TextPosition(offset: currentDeadline.length),);
+                                                                return;
+                                                              }
+                                                              currentDeadline = input;
+                                                            });
+                                                          });
+                                                        },
+                                                        style: TextStyle(color: themeColor[1]),
+                                                        decoration: InputDecoration(
+                                                          hintText: 'Enter deadline details',
+                                                          hintStyle: TextStyle(color: themeColor[1]),
+                                                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: themeColor[1])),
+                                                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: themeColor[1])),
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            onPressed: () {
+                                                              showDatePicker(
+                                                                context: context,
+                                                                firstDate: DateTime.now(),
+                                                                lastDate: DateTime(2100),
+                                                                initialDate: DateTime.now(),
+                                                                builder: (context, child) {
+                                                                  return Theme(
+                                                                    data: Theme.of(context).copyWith(
+                                                                      colorScheme: isLightTheme ? ColorScheme.light(primary: themeColor[1].withOpacity(0.6), onPrimary: themeColor[1], onSurface: themeColor[1], surface: themeColor[0]) : ColorScheme.dark(primary: themeColor[1].withOpacity(0.6), onPrimary: themeColor[1], onSurface: themeColor[1], surface: themeColor[0]),
+                                                                      textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: themeColor[1])),
+                                                                      dividerColor: themeColor[1],
+                                                                      dialogBackgroundColor: themeColor[1],
+                                                                      dialogTheme: DialogThemeData(backgroundColor: themeColor[0], surfaceTintColor: Colors.transparent),
+                                                                    ),
+                                                                    child: child!,
+                                                                  );
+                                                                },
+                                                              ).then((selectedDate) {
+                                                                if (selectedDate != null) {
+                                                                  setState(() {
+                                                                    setDialogState(() {
+                                                                      currentDate = selectedDate;
+                                                                    });
+                                                                  });
+                                                                }
+                                                              });
+                                                            },
+                                                            icon: AnimIcon(themeColor[1], themeIcon[0], Icons.date_range_outlined),
+                                                          ),
+                                                          currentDate!=DateTime.utc(0, 0, 0)
+                                                              ? Expanded(
+                                                                  child: Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.only(top: 2, right: 8.0, bottom: 0.0, left: 1.0),
+                                                                        child: Text('${currentDate.month}/${currentDate.day}/${currentDate.year}', style: TextStyle(color: themeColor[1], fontSize: 16)),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.only(top: 2, right: 0.0, bottom: 0.0, left: 18.0),
+                                                                        child: IconButton(
+                                                                          onPressed: () {
+                                                                            setState(() {
+                                                                              setDialogState(() {
+                                                                                currentDate = DateTime.utc(0, 0, 0);
+                                                                              });
+                                                                            });
+                                                                          },
+                                                                          icon: Icon(Icons.close_outlined, color: themeColor[1], size: 18),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              : SizedBox.shrink(),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  });
-                                },
-                                icon: AnimIcon(themeColor[1], themeIcon[0], Icons.edit_outlined),
+                                          );
+                                        },
+                                      );
+                                    });
+                                  },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16.0, left: 18.0, right: 5.0, bottom: 10.0),
+                                      child: AnimText(
+                                        deadline,
+                                        style: TextStyle(fontSize: 19.5, color: themeColor[1]),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ), ?dates[deadlines.indexOf(deadline)]==DateTime.utc(0, 0, 0) ? null : Padding(
+                                      padding: const EdgeInsets.only(top: 0, left:20.0, right: 5.0, bottom: 10.0),
+                                      child: AnimText('${dates[deadlines.indexOf(deadline)].month}/${dates[deadlines.indexOf(deadline)].day}/${dates[deadlines.indexOf(deadline)].year}, Due ${dateCalculator(nowDate, dates[deadlines.indexOf(deadline)])}', style: TextStyle(fontSize: 17, color: themeColor[1]),),
+                                      )
+                                  ],
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0, right: 0.0, bottom: 8.0, left: 1.0),
-                              child: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    dates.removeAt(deadlines.indexOf(deadline));
-                                    deadlines.remove(deadline);
-                                    _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, deadlines: deadlines, dates: dates);
-                                  });
-                                },
-                                icon: AnimIcon(themeColor[1], themeIcon[0], Icons.delete_outlined),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0, right: 1.0, bottom: 8.0, left: 2.0),
+                                child: IconButton(
+                                  onPressed: () {
+                                    currentDeadline = deadline;
+                                    currentDate = dates[deadlines.indexOf(deadline)];
+                                    setState(() {
+                                      TextEditingController textEditingController = TextEditingController()..text = deadline;
+                                      showAdaptiveDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setDialogState) => Center(
+                                              child: SingleChildScrollView(
+                                                child: AlertDialog(
+                                                  backgroundColor: themeColor[0],
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: (currentDeadline.isEmpty || (currentDeadline == deadline && currentDate == dates[deadlines.indexOf(deadline)]))
+                                                          ? null
+                                                          : () {
+                                                              setState(() {
+                                                                final i = deadlines.indexOf(deadline);
+                                                                deadlines[i] = currentDeadline;
+                                                                dates[i] = currentDate;
+                                                                currentDeadline = '';
+                                                                currentDate = DateTime.utc(0, 0, 0);
+                                                                _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, deadlines: deadlines, dates: dates);
+                                                              });
+                                                              Navigator.of(context).pop();
+                                                            },
+                                                      child: Text('Save', style: TextStyle(color: (currentDeadline.isEmpty || (currentDeadline == deadline && currentDate == dates[deadlines.indexOf(deadline)])) ? Colors.grey : themeColor[1])),
+                                                    ),
+                                                  ],
+                                                  title: Text("Edit Deadline", style: TextStyle(color: themeColor[1])),
+                                                  content: Column(
+                                                    children: [
+                                                      TextField(
+                                                        controller: textEditingController,
+                                                        cursorColor: themeColor[1],
+                                                        onChanged: (input) {
+                                                          setState(() {
+                                                            setDialogState(() {
+                                                              if(input.length>50){
+                                                                textEditingController.text = currentDeadline;
+                                                                textEditingController.selection = TextSelection.fromPosition(TextPosition(offset: currentDeadline.length),);
+                                                                return;
+                                                              }
+                                                              currentDeadline = input;
+                                                            });
+                                                          });
+                                                        },
+                                                        style: TextStyle(color: themeColor[1]),
+                                                        decoration: InputDecoration(
+                                                          hintText: 'Enter deadline details',
+                                                          hintStyle: TextStyle(color: themeColor[1]),
+                                                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: themeColor[1])),
+                                                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: themeColor[1])),
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            onPressed: () {
+                                                              showDatePicker(
+                                                                context: context,
+                                                                firstDate: DateTime.now(),
+                                                                lastDate: DateTime(2100),
+                                                                initialDate: DateTime.now(),
+                                                                builder: (context, child) {
+                                                                  return Theme(
+                                                                    data: Theme.of(context).copyWith(
+                                                                      colorScheme: isLightTheme ? ColorScheme.light(primary: themeColor[1].withOpacity(0.6), onPrimary: themeColor[1], onSurface: themeColor[1], surface: themeColor[0]) : ColorScheme.dark(primary: themeColor[1].withOpacity(0.6), onPrimary: themeColor[1], onSurface: themeColor[1], surface: themeColor[0]),
+                                                                      textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: themeColor[1])),
+                                                                      dividerColor: themeColor[1],
+                                                                      dialogBackgroundColor: themeColor[1],
+                                                                      dialogTheme: DialogThemeData(backgroundColor: themeColor[0], surfaceTintColor: Colors.transparent),
+                                                                    ),
+                                                                    child: child!,
+                                                                  );
+                                                                },
+                                                              ).then((selectedDate) {
+                                                                if (selectedDate != null) {
+                                                                  setState(() {
+                                                                    setDialogState(() {
+                                                                      currentDate = selectedDate;
+                                                                    });
+                                                                  });
+                                                                }
+                                                              });
+                                                            },
+                                                            icon: AnimIcon(themeColor[1], themeIcon[0], Icons.date_range_outlined),
+                                                          ),
+                                                          currentDate!=DateTime.utc(0, 0, 0)
+                                                              ? Expanded(
+                                                                  child: Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.only(top: 2, right: 8.0, bottom: 0.0, left: 1.0),
+                                                                        child: Text('${currentDate.month}/${currentDate.day}/${currentDate.year}', style: TextStyle(color: themeColor[1], fontSize: 16)),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.only(top: 2, right: 0.0, bottom: 0.0, left: 18.0),
+                                                                        child: IconButton(
+                                                                          onPressed: () {
+                                                                            setState(() {
+                                                                              setDialogState(() {
+                                                                                currentDate = DateTime.utc(0, 0, 0);
+                                                                              });
+                                                                            });
+                                                                          },
+                                                                          icon: Icon(Icons.close_outlined, color: themeColor[1], size: 18),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              : SizedBox.shrink(),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    });
+                                  },
+                                  icon: AnimIcon(themeColor[1], themeIcon[0], Icons.edit_outlined),
+                                ),
                               ),
-                            ),
-                          ],
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0, right: 0.0, bottom: 8.0, left: 1.0),
+                                child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      dates.removeAt(deadlines.indexOf(deadline));
+                                      deadlines.remove(deadline);
+                                      _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, deadlines: deadlines, dates: dates);
+                                    });
+                                  },
+                                  icon: AnimIcon(themeColor[1], themeIcon[0], Icons.delete_outlined),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                     ],
                   ),
