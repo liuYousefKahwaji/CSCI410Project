@@ -350,7 +350,7 @@ class _MainAppState extends State<MainApp> {
                                 content: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Version: 1.0.0', style: TextStyle(color: themeColor[1])),
+                                    Text('Version: vFinalPhase1', style: TextStyle(color: themeColor[1])),
                                     Text('Created by: Yousef Kahwaji', style: TextStyle(color: themeColor[1])),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8.0, bottom: 0.0),
