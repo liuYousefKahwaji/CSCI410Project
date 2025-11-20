@@ -1,3 +1,8 @@
+# v1.2
+
+- added ability to click on deadline (InkWell), functions same as edit
+
+
 # v1.1
 
 - changed dates list from String to DateTime, modified read and write functions to accomodate the change, as well as all usages for dates
