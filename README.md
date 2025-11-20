@@ -42,6 +42,7 @@
 * cannot save an edited deadline if title and date match (grayed out save button)
 
 ## Future Plans
+* "Complete deadline", functions like delete but stores in a different "Completed" area
 * Sorting and filtering deadlines
 * Notifications for upcoming deadlines
 * Decreasing code size, removing repetitions into methods / widgets
