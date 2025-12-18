@@ -1,3 +1,7 @@
+# vFinalPhase1
+
+- Nothing of note added. Fixed version in about section.
+
 # v1.2
 
 - added ability to click on deadline (InkWell), functions same as edit
