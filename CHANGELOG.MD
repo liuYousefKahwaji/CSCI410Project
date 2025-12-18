@@ -1,3 +1,9 @@
+# v2.1
+
+- Added a filtering / sorting system for the deadlines
+- Support sorting by name, date, and reverting the sort to default
+- Supports ascending and descending order
+
 # v2.0
 
 - Added a fully functional Login / Register page
