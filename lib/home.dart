@@ -1,8 +1,11 @@
+// ignore_for_file: non_constant_identifier_names, deprecated_member_use
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project/Auth/AnimIcon.dart';
 import 'package:project/Auth/auth.dart';
 import 'package:project/Auth/user.dart';
+import 'package:project/Deadline.dart';
 import 'AnimText.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -19,7 +22,6 @@ class Home extends StatefulWidget {
     return user;
   }
 }
-
 
 Future<void> _writeData({required bool isLightTheme, required List<Color> themeColor, required List<Color> colorLight, required List<Color> colorDark, required User user}) async {
   if (user.username.isEmpty || user.password.isEmpty) {
@@ -92,6 +94,43 @@ void restore(User u) {
   _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, user: u);
 }
 
+bool sortFlag = true;
+String prevSortBy = '';
+
+void sortDeadlines(String sortBy) {
+  List<Deadline> temp = [];
+  for (int i = 0; i < deadlines.length; i++) {
+    temp.add(Deadline(deadlineIds[i], deadlines[i], dates[i]));
+  }
+  if (sortFlag) {
+    if (sortBy == 'name') {
+    temp.sort((a, b) => a.d_name.compareTo(b.d_name));
+    } else if (sortBy == 'date') {
+      temp.sort((a, b) => a.d_date.compareTo(b.d_date));
+    }
+  } else {
+    if (sortBy == 'name') {
+      temp.sort((a, b) => b.d_name.compareTo(a.d_name));
+    } else if (sortBy == 'date') {
+      temp.sort((a, b) => b.d_date.compareTo(a.d_date));
+    }
+  }
+  if(prevSortBy == sortBy) {
+    sortFlag = !sortFlag;
+  } else {
+    sortFlag = true;
+    prevSortBy = sortBy;
+  }
+  deadlines.clear();
+  dates.clear();
+  deadlineIds.clear();
+  for (int i = 0; i < temp.length; i++) {
+    deadlines.add(temp[i].d_name);
+    dates.add(temp[i].d_date);
+    deadlineIds.add(temp[i].d_id);
+  }
+}
+
 List<Color> colorLight = [Color.fromARGB(255, 246, 246, 246), Colors.blue];
 List<Color> colorDark = [Color.fromARGB(255, 20, 20, 20), Colors.deepPurple];
 List<IconData> iconLight = [Icons.light_mode_outlined];
@@ -109,6 +148,8 @@ List<Color> themeColor = colorLight;
 List<IconData> themeIcon = iconLight;
 
 Future<void> getDeadlinesFromDB(String username) async {
+  sortFlag = true;
+  prevSortBy = '';
   try {
     final response = await http.get(Uri.parse('http://localhost/getDeadlines.php?username=$username'));
     if (response.statusCode == 200) {
@@ -124,8 +165,7 @@ Future<void> getDeadlinesFromDB(String username) async {
         }
       }
     }
-  } catch (e) {
-  }
+  } catch (_) {}
 }
 
 Future<bool> insertDeadline(String username, String d_name, DateTime d_date) async {
@@ -510,7 +550,7 @@ class _HomeState extends State<Home> {
                                             builder: (context) => AlertDialog(
                                               backgroundColor: themeColor[0],
                                               title: Text('Confirm', style: TextStyle(color: themeColor[1])),
-                                              content: Text('Are you sure you want to log out? All theme data will be deleted, deadlines will be saved on cloud.\nThis action cannot be undone.', style: TextStyle(color: themeColor[1])),
+                                              content: Text('Are you sure you want to log out? All theme data will be deleted, deadlines will be saved.', style: TextStyle(color: themeColor[1])),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () => Navigator.of(context).pop(),
@@ -524,7 +564,7 @@ class _HomeState extends State<Home> {
                                                     });
                                                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => Auth()));
                                                   },
-                                                  child: Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                                                  child: Text('Log out', style: TextStyle(color: Colors.redAccent)),
                                                 ),
                                               ],
                                             ),
@@ -717,8 +757,40 @@ class _HomeState extends State<Home> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: AnimText("You have ${deadlines.length} deadline${deadlines.length == 1 ? '' : 's'}:", style: TextStyle(fontSize: 24, color: themeColor[1])),
+                        padding: const EdgeInsets.only(left: 8.0, right: 16.0, top: 16.0, bottom: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(onPressed: () {
+                              showMenu(context: context, position: RelativeRect.fill, color: themeColor[0],items: [
+                                PopupMenuItem(
+                                  onTap: () {
+                                    setState(() {
+                                      sortDeadlines('name');
+                                    });
+                                  },
+                                  child: Text('Sort by Name ${prevSortBy == 'name' ? (sortFlag ? '↑' : '↓') : ''}', style: TextStyle(color: themeColor[1])),
+                                ),
+                                PopupMenuItem(
+                                  onTap: () {
+                                    setState(() {
+                                      sortDeadlines('date');
+                                    });
+                                  },
+                                  child: Text('Sort by Date ${prevSortBy == 'date' ? (sortFlag ? '↑' : '↓') : ''}', style: TextStyle(color: themeColor[1])),
+                                ),
+                                PopupMenuItem(
+                                  onTap: () {
+                                    getDeadlines();
+                                  },
+                                  child: Text('Revert sort', style: TextStyle(color: themeColor[1])),
+                                ),
+                              ]);
+                            }, icon: AnimIcon(themeColor[1], themeIcon[0], Icons.swap_vert)),
+                            SizedBox(width: 8.0),
+                            AnimText("You have ${deadlines.length} deadline${deadlines.length == 1 ? '' : 's'}:", style: TextStyle(fontSize: 24, color: themeColor[1])),
+                          ],
+                        ),
                       ),
                       for (int i = 0; i < deadlines.length; i++)
                         InkWell(
