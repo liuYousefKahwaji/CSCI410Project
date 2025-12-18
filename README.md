@@ -35,9 +35,9 @@
 * support for many deadlines (scrollable)
 * setting custom color includes a preview circle thing
 * date picker for adding deadlines
-* support for dateless deadlines and ones with date
+* ~~support for dateless deadlines~~ and ones with date - Removed in v2.0
 * edit menu starts with initial value of deadline and date (eg. if deadline is "Birthday" and date is "11/28/2025", then the edit menu starts with those values)
-* removing date in the edit menu if set
+* removing date in the edit menu if set, **However, cannot confirm without a date** <-Added in v2.0
 * cannot save a deadline if title is empty (grays out the save button and makes it non-functional)
 * cannot save an edited deadline if title and date match (grayed out save button)
 
@@ -46,5 +46,6 @@
 * Sorting and filtering deadlines
 * Notifications for upcoming deadlines
 * Decreasing code size, removing repetitions into methods / widgets
+* ~~Adding a login page with backend~~ Done in v2.0
 * ~~Making each deadline clickable (edit)~~ Done in v1.2
 * ~~Adding a "Due in x days" feature~~ Done in v1.1
