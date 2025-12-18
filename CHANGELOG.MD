@@ -1,3 +1,13 @@
+# v2.0
+
+- Added a fully functional Login / Register page
+- Added fully functional backend. Database, and APIs
+- Each user has their own deadlines
+- Insert (add), update (edit), delete, deadlines are allowed
+- Revamped the read-write functionality. Now only the theme data and user data are stored locally. Deadlines and dates are stored on database
+- Added a refresh button to the appbar for refreshing deadlines in case of modification from database or different device
+- Changed delete data feature to log out
+
 # vFinalPhase1
 
 - Nothing of note added. Fixed version in about section.
