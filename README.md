@@ -43,7 +43,7 @@
 
 ## Future Plans
 * "Complete deadline", functions like delete but stores in a different "Completed" area
-* Sorting and filtering deadlines
+* ~~Sorting and filtering deadlines~~ - Done in v2.1
 * Notifications for upcoming deadlines
 * Decreasing code size, removing repetitions into methods / widgets
 * ~~Adding a login page with backend~~ Done in v2.0
