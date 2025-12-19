@@ -7,6 +7,9 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+// Base URL for API endpoints - change this to update all API calls
+const String baseUrl = 'http://localhost';
+
 void main(){
   runApp(const MainApp());
 }
@@ -19,7 +22,7 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  Widget initialScreen = Auth();
+  Widget initialScreen = Auth(baseUrl: baseUrl);
   bool isLoading = true;
 
   Future<void> checkAutoLogin() async {
@@ -33,9 +36,8 @@ class _MainAppState extends State<MainApp> {
         final password = data['password'] ?? '';
 
         if (username.isNotEmpty && password.isNotEmpty) {
-          // Try to log in with saved credentials
           try {
-            final response = await http.get(Uri.parse('http://localhost/getUsers.php'));
+            final response = await http.get(Uri.parse('$baseUrl/getUsers.php'));
             if (response.statusCode == 200) {
               final temp = jsonDecode(response.body);
               final users = temp.map((e) => User(username: e['username'], password: e['password'])).toList();
@@ -43,7 +45,7 @@ class _MainAppState extends State<MainApp> {
               for (var user in users) {
                 if (user.username == username && user.password == password) {
                   setState(() {
-                    initialScreen = Home(user: User(username: username, password: password));
+                    initialScreen = Home(user: User(username: username, password: password), baseUrl: baseUrl);
                     isLoading = false;
                   });
                   return;
@@ -56,7 +58,7 @@ class _MainAppState extends State<MainApp> {
     } catch (_) {}
     
     setState(() {
-      initialScreen = Auth();
+      initialScreen = Auth(baseUrl: baseUrl);
       isLoading = false;
     });
   }

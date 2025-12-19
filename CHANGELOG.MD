@@ -1,3 +1,15 @@
+# v2.2
+
+- Fixed issue with appbar title overflow
+- changed all references to localhost to a baseUrl variable in main.dart for easy changing of backend host
+- Fixed some other sizing issues
+
+# v2.1
+
+- Added a filtering / sorting system for the deadlines
+- Support sorting by name, date, and reverting the sort to default
+- Supports ascending and descending order
+
 # v2.0
 
 - Added a fully functional Login / Register page

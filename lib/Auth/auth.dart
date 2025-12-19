@@ -10,7 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class Auth extends StatefulWidget {
-  const Auth({super.key});
+  final String baseUrl;
+  const Auth({required this.baseUrl, super.key});
 
   @override
   State<Auth> createState() => _AuthState();
@@ -22,9 +23,9 @@ bool login = true;
 List<User> users = [];
 List temp = [];
 
-Future<void> getUsers() async {
+Future<void> getUsers(String baseUrl) async {
   try {
-    final response = await http.get(Uri.parse('http://localhost/getUsers.php'));
+    final response = await http.get(Uri.parse('$baseUrl/getUsers.php'));
     if (response.statusCode == 200) {
       temp = jsonDecode(response.body);
       users = temp.map((e) => User(username: e['username'], password: e['password'])).toList();
@@ -32,15 +33,15 @@ Future<void> getUsers() async {
   } catch (_) {}
 }
 
-Future<void> insertUser(User u) async {
+Future<void> insertUser(String baseUrl, User u) async {
   try {
     final response = await http.post(
-      Uri.parse('http://localhost/insertUser.php'),
+      Uri.parse('$baseUrl/insertUser.php'),
       body: jsonEncode({'username': u.username, 'password': u.password}),
       headers: {"Content-Type": "application/json"},
     );
     if (response.statusCode == 200) {
-      getUsers();
+      getUsers(baseUrl);
     }
   } catch (_) {}
 }
@@ -61,7 +62,7 @@ class _AuthState extends State<Auth> {
   @override
   void initState() {
     super.initState();
-    getUsers();
+    getUsers(widget.baseUrl);
   }
 
   @override
@@ -75,7 +76,7 @@ class _AuthState extends State<Auth> {
             return false;
           }
         }
-        await insertUser(u);
+        await insertUser(widget.baseUrl, u);
         await _writeData(user: u);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('User $username registered successfully.')));
         return true;
@@ -140,7 +141,7 @@ class _AuthState extends State<Auth> {
                       ),
                       onPressed: () async {
                         if(await validateUser(usernameController.text, passwordController.text)){
-                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Home(user: User(username: usernameController.text, password: passwordController.text),), settings: RouteSettings(arguments: User(username: usernameController.text, password: passwordController.text),),));
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Home(user: User(username: usernameController.text, password: passwordController.text), baseUrl: widget.baseUrl), settings: RouteSettings(arguments: User(username: usernameController.text, password: passwordController.text),),));
                           usernameController.clear();
                           passwordController.clear();
                         }

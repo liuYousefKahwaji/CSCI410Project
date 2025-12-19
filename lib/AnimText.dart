@@ -15,11 +15,9 @@ Widget AnimText(
     duration: duration,
     curve: curve,
     style: style,
-    child: Text(
-      text,
-      maxLines: maxLines,
-      overflow: overflow,
-      textAlign: textAlign,
+    child: FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(text, maxLines: maxLines, overflow: overflow, textAlign: textAlign),
     ),
   );
 }

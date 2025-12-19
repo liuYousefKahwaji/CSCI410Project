@@ -14,7 +14,8 @@ import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   final User user;
-  const Home({required this.user, super.key});
+  final String baseUrl;
+  const Home({required this.user, required this.baseUrl, super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -147,11 +148,11 @@ DateTime nowDate = DateTime.now();
 List<Color> themeColor = colorLight;
 List<IconData> themeIcon = iconLight;
 
-Future<void> getDeadlinesFromDB(String username) async {
+Future<void> getDeadlinesFromDB(String baseUrl, String username) async {
   sortFlag = true;
   prevSortBy = '';
   try {
-    final response = await http.get(Uri.parse('http://localhost/getDeadlines.php?username=$username'));
+    final response = await http.get(Uri.parse('$baseUrl/getDeadlines.php?username=$username'));
     if (response.statusCode == 200) {
       final temp = jsonDecode(response.body);
       deadlines.clear();
@@ -168,10 +169,10 @@ Future<void> getDeadlinesFromDB(String username) async {
   } catch (_) {}
 }
 
-Future<bool> insertDeadline(String username, String d_name, DateTime d_date) async {
+Future<bool> insertDeadline(String baseUrl, String username, String d_name, DateTime d_date) async {
   try {
     final response = await http.post(
-      Uri.parse('http://localhost/insertDeadline.php'),
+      Uri.parse('$baseUrl/insertDeadline.php'),
       body: jsonEncode({
         'username': username,
         'd_name': d_name,
@@ -185,10 +186,10 @@ Future<bool> insertDeadline(String username, String d_name, DateTime d_date) asy
   }
 }
 
-Future<bool> updateDeadline(String username, int d_id, String d_name, DateTime d_date) async {
+Future<bool> updateDeadline(String baseUrl, String username, int d_id, String d_name, DateTime d_date) async {
   try {
     final response = await http.post(
-      Uri.parse('http://localhost/updateDeadline.php'),
+      Uri.parse('$baseUrl/updateDeadline.php'),
       body: jsonEncode({
         'username': username,
         'd_id': d_id,
@@ -203,10 +204,10 @@ Future<bool> updateDeadline(String username, int d_id, String d_name, DateTime d
   }
 }
 
-Future<bool> deleteDeadline(String username, int d_id) async {
+Future<bool> deleteDeadline(String baseUrl, String username, int d_id) async {
   try {
     final response = await http.post(
-      Uri.parse('http://localhost/deleteDeadline.php'),
+      Uri.parse('$baseUrl/deleteDeadline.php'),
       body: jsonEncode({
         'username': username,
         'd_id': d_id
@@ -237,7 +238,7 @@ class _HomeState extends State<Home> {
     
     final effectiveUser = getEffectiveUser();
     if (effectiveUser.username.isNotEmpty && effectiveUser.password.isNotEmpty) {
-      await getDeadlinesFromDB(effectiveUser.username);
+      await getDeadlinesFromDB(widget.baseUrl, effectiveUser.username);
       await _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, user: effectiveUser);
       currentUser = effectiveUser;
     }
@@ -562,7 +563,7 @@ class _HomeState extends State<Home> {
                                                     setState(() {
                                                       restore(widget.user);
                                                     });
-                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => Auth()));
+                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => Auth(baseUrl: widget.baseUrl)));
                                                   },
                                                   child: Text('Log out', style: TextStyle(color: Colors.redAccent)),
                                                 ),
@@ -603,7 +604,10 @@ class _HomeState extends State<Home> {
                   duration: Duration(milliseconds: 500),
                   curve: Curves.easeInOut,
                   style: TextStyle(fontSize: 20, color: themeColor[0]),
-                  child: Text('Deadline Tracker'),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text('Deadline Tracker'),
+                  ),
                 ),
               ),
             ),
@@ -716,7 +720,7 @@ class _HomeState extends State<Home> {
                             TextButton(
                               onPressed: currentDeadline.isNotEmpty && currentDate != DateTime.utc(0, 0, 0) && getEffectiveUser().username.isNotEmpty
                                   ? () async {
-                                      final success = await insertDeadline(getEffectiveUser().username, currentDeadline, currentDate);
+                                      final success = await insertDeadline(widget.baseUrl, getEffectiveUser().username, currentDeadline, currentDate);
                                       if (success) {
                                         Navigator.of(context).pop();
                                         currentDeadline = '';
@@ -788,7 +792,12 @@ class _HomeState extends State<Home> {
                               ]);
                             }, icon: AnimIcon(themeColor[1], themeIcon[0], Icons.swap_vert)),
                             SizedBox(width: 8.0),
-                            AnimText("You have ${deadlines.length} deadline${deadlines.length == 1 ? '' : 's'}:", style: TextStyle(fontSize: 24, color: themeColor[1])),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: AnimText("You have ${deadlines.length} deadline${deadlines.length == 1 ? '' : 's'}:", style: TextStyle(fontSize: 24, color: themeColor[1])),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -815,7 +824,7 @@ class _HomeState extends State<Home> {
                                                 onPressed: (currentDeadline.isEmpty || currentDate == DateTime.utc(0, 0, 0) || (currentDeadline == deadline && currentDate == dates[i]))
                                                     ? null
                                                     : () async {
-                                                        final success = await updateDeadline(getEffectiveUser().username, currentDeadlineId, currentDeadline, currentDate);
+                                                        final success = await updateDeadline(widget.baseUrl, getEffectiveUser().username, currentDeadlineId, currentDeadline, currentDate);
                                                         if (success) {
                                                           Navigator.of(dialogContext).pop();
                                                           currentDeadline = '';
@@ -970,7 +979,7 @@ class _HomeState extends State<Home> {
                                                       onPressed: (currentDeadline.isEmpty || currentDate == DateTime.utc(0, 0, 0) || (currentDeadline == deadline && currentDate == dates[i]))
                                                           ? null
                                                           : () async {
-                                                              final success = await updateDeadline(getEffectiveUser().username, currentDeadlineId, currentDeadline, currentDate);
+                                                              final success = await updateDeadline(widget.baseUrl, getEffectiveUser().username, currentDeadlineId, currentDeadline, currentDate);
                                                               if (success) {
                                                                 Navigator.of(dialogContext).pop();
                                                                 currentDeadline = '';
@@ -1086,7 +1095,7 @@ class _HomeState extends State<Home> {
                                 child: IconButton(
                                   onPressed: () async {
                                     if (i >= 0 && i < deadlineIds.length && i < deadlines.length) {
-                                      final success = await deleteDeadline(getEffectiveUser().username, deadlineIds[i]);
+                                      final success = await deleteDeadline(widget.baseUrl, getEffectiveUser().username, deadlineIds[i]);
                                       if (success) {
                                         await _writeData(isLightTheme: isLightTheme, themeColor: themeColor, colorLight: colorLight, colorDark: colorDark, user: getEffectiveUser());
                                         await getDeadlines();
