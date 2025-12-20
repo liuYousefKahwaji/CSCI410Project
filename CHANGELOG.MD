@@ -1,3 +1,7 @@
+# v3.1
+
+- Fixed version in about section
+
 # v3.0 - Major UI Update
 
 - Added a bool for even easier change between selfhosted and online hosted
