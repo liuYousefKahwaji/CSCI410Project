@@ -1,3 +1,13 @@
+# v3.0 - Major UI Update
+
+- Added a bool for even easier change between selfhosted and online hosted
+- Changed the default dark mode color to a slightly lighter purple
+- Completely redone the date calculation method, more accurate now
+- Smoothed the deadline insertion by moving the pop outside the await check
+- Changed the filter icon
+- Revampled the deadline display ui completely, now each deadline has its own container
+- Added an "urgency" feature, done by the color of the due pill-object thing
+
 # v2.2
 
 - Fixed issue with appbar title overflow

@@ -18,9 +18,10 @@
 ### Backend Setup:
 * Set up a MySQL database named "deadtrack"
 * Configure PHP backend files in Backend/ directory
-* Update baseUrl in lib/main.dart to point to your backend server
-* Alternatively, Xampp can be used by changing baseUrl to http://localhost, and uploading the sql file to phpmyadmin
-* I have set up a host and uploaded the backend and sql to it. change baseUrl in main.dart to http://yakback.atwebpages.com to use it
+* Change the `isLocal` bool in lib/main.dart (true for localhost, false for hosted server)
+* For local testing: set `isLocal = true` (uses http://localhost)
+* For hosted testing: set `isLocal = false` (uses http://yakback.atwebpages.com)
+* Alternatively, Xampp can be used with `isLocal = true`, and upload the sql file to phpmyadmin
 
 ## Done With
 * Flutter (Dart)
@@ -28,7 +29,7 @@
 * PHP (Backend)
 * MySQL (Database)
 
-## Features (v2):
+## Features (v3):
 * login and register system with user authentication
 * backend database storage for deadlines (MySQL)
 * each user has their own separate deadlines
@@ -36,18 +37,23 @@
 * editing deadlines
 * deleting deadlines
 * sorting deadlines by name or date (ascending/descending)
+* urgency color system - deadlines show color-coded urgency based on how soon they're due
 * changing theme between light and dark
 * choosing an accent color from list or custom accent color
 * local storage for theme preferences and user credentials (auto-login)
 * refresh button to sync deadlines with database
 * about menu with logout functionality
-* "Due in x days" feature showing time until deadline
+* An improved "Due in x days" feature with more accurate date calculations
+* A revamped deadline display UI with individual containers for each deadline
 
-## Details (v2):
+## Details (v3):
 * intuitive and theme-friendly icons for (almost) everything
 * smooth animations for all color changes
 * support for text overflow
 * support for many deadlines (scrollable)
+* each deadline displayed in its own container with rounded borders and accent color background
+* urgency color coding for deadline dates: red (overdue/today), orange (1-3 days), amber (4-7 days), green (8-30 days), blue gray (31+ days)
+* more accurate date calculation using improved daysCalculator function
 * setting custom color includes a preview circle thing
 * date picker for adding deadlines
 * deadlines require both title and date (cannot save without date)
@@ -58,6 +64,8 @@
 * clicking on a deadline opens the edit dialog
 * auto-login functionality - saves user credentials locally and automatically logs in on app start
 * theme preferences (light/dark mode and accent colors) saved locally per device
+* default dark mode color updated to a lighter purple (v3.0)
+* easy backend switching via `isLocal` bool in main.dart
 * backend API endpoints: getUsers, insertUser, getDeadlines, insertDeadline, updateDeadline, deleteDeadline
 
 ## Backend Structure:
@@ -67,10 +75,12 @@
 
 ## Future Plans
 * "Complete deadline", functions like delete but stores in a different "Completed" area
-* Filtering deadlines
+* Filtering deadlines (eg, show only deadlines due this week, search by keyword, etc)
 * Notifications for upcoming deadlines
 * Decreasing code size, removing repetitions into methods / widgets
 * ~~Adding a login page with backend~~ Done in v2.0
 * ~~Making each deadline clickable (edit)~~ Done in v1.2
 * ~~Adding a "Due in x days" feature~~ Done in v1.1
-* ~~Sorting deadlines~~ Done in v2.0
+* ~~Sorting deadlines~~ Done in v2.1
+* ~~overhaul ui~~ Done in v3.0
+* ~~Urgency color system~~ Done in v3.0

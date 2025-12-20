@@ -7,8 +7,11 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-// Base URL for API endpoints - change this to update all API calls
-const String baseUrl = 'http://localhost';
+// Base URL for API. change this to update api pages
+//http://localhost for local testing
+//http://yakback.atwebpages.com for hosted testing
+const bool isLocal = true; //change this to true to use local testing, false to use hosted testing
+const String baseUrl = isLocal ? 'http://localhost' : 'http://yakback.atwebpages.com';
 
 void main(){
   runApp(const MainApp());
